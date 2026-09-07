@@ -1,0 +1,52 @@
+.page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-5) calc(var(--sp-8) + var(--safe-bottom));
+  overflow: hidden;
+}
+
+/* Empty / Error 结果态 */
+.resultWrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6);
+  text-align: center;
+}
+
+.resultDeco {
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  color: var(--moss);
+  opacity: 0.85;
+}
+
+.resultTitle {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.resultDesc {
+  font-size: var(--fs-base);
+  color: var(--ink-mute);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 260px;
+}
+
+/* 使用 global.css 中的 spoon-fade-in / spoon-pen-draw / spoon-wash-in */

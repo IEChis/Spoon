@@ -1,0 +1,414 @@
+@import './tokens.css';
+
+/* ============================================================
+   Reset / Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.62;
+  color: var(--ink);
+  background: #14181a; /* 桌面预览时的舞台底色 */
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ============================================================
+   手机舞台（Mobile First）
+   真机 / 窄屏：铺满全屏
+   桌面预览：居中呈现 375 宽的手机画框
+   ============================================================ */
+.stage {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+@media (min-width: 500px) {
+  .stage {
+    align-items: center;
+    padding: 28px 0;
+    background: #1b2022;
+  }
+}
+
+.app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh; /* 旧版 iOS Safari 兜底 */
+  height: 100dvh; /* 动态视口高度，避开地址栏伸缩 */
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  /* 极淡的暖白高光，给一点轻盈与温度，不抢戏 */
+  background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.45) 0, transparent 55%);
+  isolation: isolate;
+}
+
+/* 桌面预览：以 375×812（新版 iPhone 基准）呈现手机画框 */
+@media (min-width: 500px) {
+  .app {
+    max-width: 375px;
+    height: 812px;
+    max-height: calc(100dvh - 56px);
+    border-radius: 44px;
+    box-shadow:
+      0 0 0 10px #1b2123,
+      0 0 0 12px #333d3f,
+      0 34px 80px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* ============================================================
+   页面骨架
+   ============================================================ */
+.screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  /* 页面切换：极轻的淡入上移，慢、轻、自然 */
+  animation: spoon-screen-in 0.36s ease both;
+}
+
+@keyframes spoon-screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 可滚动内容区：顶部留 header，底部留 tabbar */
+.screen__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-5) var(--sp-5);
+  padding-bottom: calc(var(--sp-10) + var(--safe-bottom));
+}
+
+.screen__body--flush {
+  padding: 0;
+  padding-bottom: var(--safe-bottom);
+}
+
+/* 带底部固定操作栏的页面（菜谱页有两行按钮 + 阴影留白，需要更高） */
+.screen__body--with-footer {
+  padding-bottom: calc(196px + var(--safe-bottom));
+}
+
+/* 底部固定操作栏 */
+.screen__footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--sp-3) var(--sp-5) calc(var(--sp-3) + var(--safe-bottom));
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: var(--sp-3);
+}
+
+/* ============================================================
+   通用排版 / 组件类
+   ============================================================ */
+.eyebrow {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* 小标签（kicker）：生活方式 App 常用的细体小字引导 */
+.kicker {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.22em;
+  color: var(--ink-mute);
+  text-transform: none;
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.muted {
+  color: var(--ink-mute);
+}
+
+/* 细发丝线，比边框更轻 */
+.hairline {
+  height: 1px;
+  background: var(--paper-line);
+  border: 0;
+  margin: 0;
+}
+
+/* 卡片：极淡抬升面 + 细发丝线 + 极轻阴影 + 中等圆角（尽量少用） */
+.card {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-xs);
+}
+
+.card--tinted {
+  background: var(--moss-soft);
+  border-color: transparent;
+}
+
+/* 纸胶带标签 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--r-full);
+  background: var(--moss-soft);
+  color: var(--moss-deep);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+}
+
+.tag--clay {
+  background: var(--clay-soft);
+  color: var(--clay-deep);
+}
+
+.tag--sand {
+  background: var(--clay-soft);
+  color: var(--clay-deep);
+}
+
+/* ============================================================
+   动画
+   ============================================================ */
+@keyframes spoon-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes spoon-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spoon-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spoon-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(420%);
+  }
+}
+
+/* 淡彩水洗扫描线：柔和、低饱和、像水痕扫过 */
+@keyframes spoon-wash-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) scaleX(0.75);
+  }
+  30% {
+    opacity: 0.55;
+  }
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(18px) scaleX(0.75);
+  }
+}
+
+@keyframes spoon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spoon-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 列表项的错落出现：给父容器加 .reveal-list，子项加 .reveal-item */
+@keyframes spoon-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 水彩显色：从模糊、欠饱和慢慢沉淀清晰，像纸上的水痕散开 */
+@keyframes spoon-wash-in {
+  from {
+    opacity: 0;
+    filter: blur(7px) saturate(0.6);
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+/* 钢笔显影：自上而下像被笔尖描出 */
+@keyframes spoon-pen-draw {
+  from {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0.2;
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+.fade-up {
+  animation: spoon-fade-up 0.34s ease both;
+}
+
+.fade-in {
+  animation: spoon-fade-in 0.3s ease both;
+}
+
+/* 水彩显色 / 钢笔显影：包裹插画或卡片使用 */
+.wash {
+  animation: spoon-wash-in 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.develop {
+  animation:
+    spoon-pen-draw 1.1s cubic-bezier(0.22, 0.61, 0.36, 1) both,
+    spoon-wash-in 1.25s ease both;
+}
+
+.reveal-item {
+  animation: spoon-reveal 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,26 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+*.log
+
+# 本地 npm 配置（仅含镜像，避免强加给协作者；上传后可保留本地文件）
+.npmrc
+
+# 类型检查 / 构建缓存
+*.tsbuildinfo
+
+# 过程与验证截图（非源码，体积大）
+shot-*.png
+spoon-375-verify.png
+verify-generate/
+verify-shots/
+
+# 产品提供的原始插画素材（未被源码直接引用，且与当前设计无关）
+素材/
+
+# 编辑器 / IDE
+.vscode/
+.idea/

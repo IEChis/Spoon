@@ -1,0 +1,187 @@
+.home {
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-7) var(--sp-6) var(--sp-5);
+}
+
+/* ---------- 顶部：一句轻量引导 ---------- */
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.sub {
+  font-size: var(--fs-md);
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* ---------- 中央：唯一核心行为 —— 拍食材 ---------- */
+.capture {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  padding: var(--sp-8) 0;
+}
+
+.captureBtn {
+  position: relative;
+  width: 152px;
+  height: 152px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 50%;
+  background: var(--moss);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  animation: spoon-breathe 3.8s ease-in-out infinite;
+}
+
+.captureBtn:active {
+  animation: none;
+  transform: scale(0.96);
+  background: var(--moss-deep);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 呼吸光环：极轻，只做「活着」的暗示 */
+.captureHalo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--moss);
+  opacity: 0.3;
+  pointer-events: none;
+  animation: spoon-halo 3.8s ease-in-out infinite;
+}
+
+.captureBtnText {
+  position: relative;
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  color: #fff;
+}
+
+.captureAlt {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.captureAlt:active {
+  color: var(--ink-soft);
+}
+
+@keyframes spoon-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes spoon-halo {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  70% {
+    transform: scale(1.16);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.16);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .captureBtn,
+  .captureHalo {
+    animation: none;
+  }
+}
+
+/* ---------- 底部：少量最近生成 ---------- */
+.recent {
+  margin-top: var(--sp-2);
+}
+
+.recentHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+  padding: 0 2px;
+}
+
+.recentTitle {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  color: var(--ink-mute);
+}
+
+.recentMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--fs-sm);
+  color: var(--moss);
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+}
+
+.recentItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 2px;
+  text-align: left;
+  border-top: 1px solid var(--line);
+}
+
+.recentName {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.recentMeta {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+}
+
+.recentChevron {
+  color: var(--ink-faint);
+  flex: none;
+}

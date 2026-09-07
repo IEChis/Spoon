@@ -1,0 +1,74 @@
+/* 菜谱主图：手绘食谱扉页式静物 */
+.recipeArt {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.wash {
+  position: absolute;
+  inset: 6% 6%;
+  width: auto;
+  height: auto;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.item {
+  position: absolute;
+  display: block;
+  filter: drop-shadow(0 6px 12px rgba(48, 44, 39, 0.1));
+}
+
+/* 真实 PNG 与 SVG 回退都填满容器，保持比例 */
+.itemArt {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* 主食材居中偏大，其余错落环绕，像随手摆的静物 */
+.item:nth-child(1) {
+  width: 64%;
+  height: 64%;
+  left: 18%;
+  top: 12%;
+  transform: rotate(-3deg);
+}
+
+.item:nth-child(2) {
+  width: 42%;
+  height: 42%;
+  left: 4%;
+  top: 50%;
+  transform: rotate(4deg);
+}
+
+.item:nth-child(3) {
+  width: 44%;
+  height: 44%;
+  right: 3%;
+  top: 52%;
+  transform: rotate(-5deg);
+}
+
+.item:nth-child(4) {
+  width: 36%;
+  height: 36%;
+  right: 12%;
+  top: 6%;
+  transform: rotate(6deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .item {
+    animation: spoon-pop 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    animation-delay: calc(0.06s * var(--i, 0));
+  }
+}

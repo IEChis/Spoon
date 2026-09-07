@@ -1,0 +1,104 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--sp-10) var(--sp-5);
+  gap: var(--sp-5);
+}
+
+.orb {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--moss-soft);
+}
+
+.orbIllu {
+  width: 64px;
+  height: 64px;
+  display: block;
+}
+
+.orb::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--moss);
+  border-right-color: rgba(62, 107, 79, 0.35);
+  animation: spoon-spin 1.1s linear infinite;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 260px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--ink-faint);
+  transition: color 0.25s ease;
+}
+
+.stepDone {
+  color: var(--ink-soft);
+}
+
+.stepActive {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.bullet {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+.stepActive .bullet {
+  opacity: 1;
+  box-shadow: 0 0 0 4px var(--moss-tint);
+}
+
+/* 骨架 */
+.skeleton {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: var(--sp-2);
+}
+
+.bar {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--paper-sunken) 25%,
+    var(--paper-line) 37%,
+    var(--paper-sunken) 63%
+  );
+  background-size: 200% 100%;
+  animation: spoon-shimmer 1.4s ease infinite;
+}

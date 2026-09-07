@@ -1,0 +1,406 @@
+.camera {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+/* 取景画面（Mock）：干净的浅色取景区，无插画、无复杂渐变 */
+.scene {
+  position: absolute;
+  inset: 0;
+  background: #edeae2;
+}
+
+/* 顶部标题栏 */
+.top {
+  position: relative;
+  z-index: 3;
+  padding-top: var(--safe-top);
+  height: calc(var(--header-h) + var(--safe-top));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: var(--sp-4);
+  padding-right: var(--sp-4);
+  color: var(--ink);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(251, 247, 238, 0.72);
+  color: var(--ink);
+  border: 1px solid var(--paper-line);
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.iconBtn:active {
+  background: rgba(239, 231, 214, 0.9);
+}
+
+.iconBtn.flashOn {
+  color: var(--clay);
+}
+
+/* 中央取景框 */
+.frameWrap {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  padding: var(--sp-5) var(--sp-6);
+}
+
+.frame {
+  position: relative;
+  width: min(76%, 320px);
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-lg);
+  background: rgba(255, 255, 255, 0.28);
+  border: 1.5px solid rgba(52, 51, 47, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--ink-faint);
+  opacity: 0.85;
+}
+
+.tl {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 10px 0 0 0;
+}
+.tr {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 10px 0 0;
+}
+.bl {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 10px;
+}
+.br {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 10px 0;
+}
+
+/* 淡彩聚焦提示线，替代科技感扫描线 */
+.scanline {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(113, 131, 107, 0.35), transparent);
+  opacity: 0.7;
+  animation: spoon-wash-scan 3.2s ease-in-out infinite;
+}
+
+.hint {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* 底部拍摄 */
+.bottom {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-8) calc(var(--sp-8) + var(--safe-bottom));
+}
+
+.sideBtn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: transparent;
+  border: 1.5px solid var(--paper-line);
+  transition: background-color 0.18s ease;
+}
+
+.sideBtn:disabled {
+  color: var(--ink-faint);
+  border-color: var(--paper-line);
+}
+
+.sideBtn:active:not(:disabled) {
+  background: rgba(239, 231, 214, 0.6);
+}
+
+.reviewBtn {
+  overflow: hidden;
+}
+
+.countBadge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--r-full);
+  background: var(--moss);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+}
+
+.shutter {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(251, 247, 238, 0.9);
+  border: 2.5px solid var(--ink);
+  box-shadow:
+    0 4px 12px rgba(48, 44, 39, 0.08),
+    inset 0 0 0 2px var(--paper-raised);
+  transition: transform 0.14s ease;
+}
+
+.shutter:active {
+  transform: scale(0.94);
+}
+
+.shutterInner {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--moss);
+  opacity: 0.85;
+  transition: opacity 0.18s ease;
+}
+
+.shutter:active .shutterInner {
+  opacity: 0.65;
+}
+
+.demoBadge {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: calc(var(--header-h) + var(--safe-top) + 12px);
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+  background: var(--paper-raised);
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  border: 1px solid var(--paper-line);
+  box-shadow: var(--shadow-sm);
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgba(251, 247, 238, 0.96);
+  animation: spoon-fade-in 0.18s ease both;
+  pointer-events: none;
+}
+
+/* 已拍胶片条：底部快门区上方 */
+.filmStrip {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--sp-8) + var(--safe-bottom) + 72px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-5);
+  pointer-events: none;
+}
+
+.filmThumbs {
+  display: flex;
+  gap: var(--sp-2);
+  padding: 6px 8px;
+  border-radius: var(--r-lg);
+  background: rgba(251, 247, 238, 0.82);
+  border: 1px solid var(--paper-line);
+  backdrop-filter: blur(4px);
+}
+
+.filmThumb {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.filmStill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #edeae2;
+}
+
+.doneBtn {
+  pointer-events: auto;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: var(--r-full);
+  background: var(--moss);
+  color: #fff;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.14s ease, background-color 0.18s ease;
+}
+
+.doneBtn:active {
+  transform: scale(0.96);
+  background: var(--moss-deep);
+}
+
+/* ---------- 拍摄完成 → 图片预览 → 继续拍 / 识别 ---------- */
+.previewMask {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  animation: spoon-fade-in 0.24s ease both;
+}
+
+.previewCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  animation: previewRise 0.34s ease both;
+}
+
+/* 定格画面：Demo 无真实照片，用干净的静帧占位 */
+.previewStill {
+  width: 190px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-lg);
+  background: #edeae2;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.previewText {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
+.previewCheck {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--moss-soft);
+  color: var(--moss);
+}
+
+@keyframes previewRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.previewActions {
+  display: flex;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: 260px;
+}
+
+.previewSecondary,
+.previewPrimary {
+  flex: 1;
+  height: 48px;
+  border-radius: var(--r-full);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: transform 0.14s ease, background-color 0.18s ease;
+}
+
+.previewSecondary {
+  background: var(--paper-raised);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+.previewSecondary:active {
+  transform: scale(0.96);
+  background: var(--paper-sunken);
+}
+
+.previewPrimary {
+  background: var(--moss);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.previewPrimary:active {
+  transform: scale(0.96);
+  background: var(--moss-deep);
+}

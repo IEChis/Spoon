@@ -1,0 +1,92 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--r-full);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition:
+    transform 0.14s ease,
+    background-color 0.18s ease,
+    box-shadow 0.2s ease,
+    opacity 0.18s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.975);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 尺寸 */
+.md {
+  height: 46px;
+  padding: 0 20px;
+  font-size: var(--fs-md);
+}
+
+.lg {
+  height: 54px;
+  padding: 0 24px;
+  font-size: var(--fs-lg);
+}
+
+.sm {
+  height: 36px;
+  padding: 0 15px;
+  font-size: var(--fs-sm);
+}
+
+/* 变体 */
+.primary {
+  background: var(--moss);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.primary:active:not(:disabled) {
+  background: var(--moss-deep);
+  box-shadow: var(--shadow-sm);
+}
+
+.clay {
+  background: var(--clay);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.clay:active:not(:disabled) {
+  background: var(--clay-deep);
+  box-shadow: var(--shadow-sm);
+}
+
+.secondary {
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 1px solid var(--paper-line);
+  box-shadow: var(--shadow-xs);
+}
+
+.secondary:active:not(:disabled) {
+  background: var(--paper-sunken);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.ghost:active:not(:disabled) {
+  background: rgba(40, 51, 43, 0.05);
+}
+
+.block {
+  width: 100%;
+}

@@ -1,0 +1,272 @@
+/* 兜底 Loading 容器：让等待态在页面里垂直居中 */
+.loadingWrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-7) var(--sp-5);
+}
+
+/* 大留白：区块之间给出明显的呼吸 */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  position: relative;
+  padding-bottom: var(--sp-4);
+}
+
+/* ---------- 第一层：菜谱名称 ---------- */
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* ---------- 第二层：一句简短的推荐理由 ---------- */
+.reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: var(--fs-md);
+  line-height: 1.8;
+  color: var(--ink-soft);
+}
+
+.reasonIcon {
+  flex: none;
+  margin-top: 5px;
+  color: var(--moss);
+}
+
+/* ---------- 第三层：烹饪信息 ---------- */
+.stats {
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: var(--sp-4) 0;
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat + .stat {
+  border-left: 1px solid var(--line);
+}
+
+.statValue {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.statLabel {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  color: var(--ink-mute);
+}
+
+/* ---------- 区块通用 ---------- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--ink-mute);
+}
+
+/* ---------- 第四层：食材 ---------- */
+.ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.ingItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border-radius: var(--r-full);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  font-size: var(--fs-base);
+  color: var(--ink);
+}
+
+.ingIcon {
+  display: inline-flex;
+  flex: none;
+}
+
+/* 手边没有的：虚线边 + 「需备」标记 */
+.ingMissing {
+  border-style: dashed;
+  color: var(--ink-soft);
+}
+
+.ingFlag {
+  font-size: var(--fs-xs);
+  color: var(--clay);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- 第五层：烹饪步骤 ---------- */
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+}
+
+/* 两位编号，厨房里一眼扫得到 */
+.stepNo {
+  flex: none;
+  width: 36px;
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--moss);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stepHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.stepTitle {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stepTime {
+  flex: none;
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+}
+
+/* 大字号 + 宽松行距，方便边做边看 */
+.stepDetail {
+  margin: 0;
+  font-size: var(--fs-lg);
+  line-height: 1.85;
+  color: var(--ink-soft);
+}
+
+/* ---------- 顶部收藏 ---------- */
+.bookmarkBtn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--ink-mute);
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.bookmarkBtn:active {
+  background: var(--paper-sunken);
+}
+
+.bookmarkOn {
+  color: var(--berry);
+}
+
+/* ---------- 底部固定操作 ---------- */
+.footerWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+.cookCta {
+  width: 100%;
+}
+
+.footerRow {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.footerRow > * {
+  flex: 1;
+}
+
+.footerSecondary {
+  color: var(--ink-soft);
+}
+
+.favOn {
+  color: var(--berry);
+}
+
+.footerPrimary {
+  color: var(--ink-soft);
+}
+
+/* ---------- 轻提示 ---------- */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--sp-6) + var(--safe-bottom));
+  transform: translateX(-50%);
+  padding: 9px 18px;
+  border-radius: var(--r-full);
+  background: rgba(52, 51, 47, 0.9);
+  color: #fbfaf6;
+  font-size: var(--fs-sm);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  animation: spoon-fade-in 0.2s ease both;
+  pointer-events: none;
+}

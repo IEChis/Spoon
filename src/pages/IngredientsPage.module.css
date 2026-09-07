@@ -1,0 +1,142 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.summaryTitle {
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+}
+
+.summaryCount {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+}
+
+.sectionTitle {
+  margin-bottom: var(--sp-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.empty {
+  padding: var(--sp-6);
+  border-radius: var(--r-md);
+  border: 1px dashed var(--paper-line);
+  text-align: center;
+  color: var(--ink-mute);
+  font-size: var(--fs-sm);
+}
+
+/* 食材库网格 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: var(--sp-3) var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  transition:
+    transform 0.14s ease,
+    border-color 0.18s ease;
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.owned {
+  border-color: var(--moss);
+  background: var(--moss-tint);
+}
+
+.tileBox {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+.tileImg {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+}
+
+.tileName {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.tileMeta {
+  font-size: 10px;
+  color: var(--ink-mute);
+}
+
+.tileFlag {
+  font-size: 10px;
+  color: var(--moss-deep);
+  font-weight: 600;
+}
+
+.cameraCta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--moss);
+  color: #fff;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+}
+
+.cameraCta:active {
+  background: var(--moss-deep);
+}
+
+.cameraGlyph {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  flex: none;
+}
+
+.cameraTitle {
+  display: block;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.cameraDesc {
+  display: block;
+  font-size: var(--fs-xs);
+  opacity: 0.85;
+  margin-top: 2px;
+}

@@ -1,0 +1,286 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  position: relative;
+}
+
+.closeBtn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink-soft);
+  transition: background-color 0.18s ease;
+}
+
+.closeBtn:active {
+  background: var(--paper-sunken);
+}
+
+/* ---------- 扫描三步面板（无照片，纯文案进度） ---------- */
+.scanPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  box-shadow: var(--shadow-xs);
+  animation: spoon-fade-up 0.3s ease both;
+}
+
+/* 识别中的主状态标题 */
+.scanTitle {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-align: center;
+}
+
+.scanRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-base);
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.scanDot {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.pulse {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--moss);
+  animation: spoon-pulse 1s ease-in-out infinite;
+}
+
+.scanLabel {
+  letter-spacing: 0.04em;
+}
+
+/* 等待态：浅灰 */
+.await .scanDot {
+  background: var(--paper-sunken);
+  box-shadow: inset 0 0 0 1px var(--paper-line);
+}
+
+.await .scanLabel {
+  color: var(--ink-faint);
+}
+
+/* 进行态：低饱和自然绿呼吸 */
+.active .scanDot {
+  background: var(--moss);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--moss) 20%, transparent);
+}
+
+.active .scanLabel {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* 完成态：墨绿打勾 */
+.done .scanDot {
+  background: var(--moss);
+}
+
+.done .scanLabel {
+  color: var(--ink-soft);
+}
+
+/* ---------- 发现数横幅 ---------- */
+.foundBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--r-full);
+  background: var(--moss-soft);
+  color: var(--moss-deep);
+  font-size: var(--fs-base);
+}
+
+.foundBanner strong {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  margin: 0 2px;
+}
+
+.foundCount {
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: color-mix(in srgb, var(--moss-deep) 70%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 观察记录 · 自然笔记小节标题 ---------- */
+.fieldHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: var(--sp-2);
+}
+
+.fieldKicker {
+  flex: none;
+  font-family: var(--font-serif);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.fieldRule {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--paper-line) 0,
+    var(--paper-line) 6px,
+    transparent 6px,
+    transparent 11px
+  );
+}
+
+/* ---------- 食材列表 ---------- */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------- 手动添加 ---------- */
+.addToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 8px 14px;
+  border-radius: var(--r-full);
+  border: 1px dashed var(--ink-faint);
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  transition: background-color 0.18s ease;
+}
+
+.addToggle:active {
+  background: var(--paper-sunken);
+}
+
+.addPanel {
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+  animation: spoon-fade-up 0.24s ease both;
+}
+
+.addLabel {
+  font-size: var(--fs-xs);
+  color: var(--ink-mute);
+  margin-bottom: var(--sp-3);
+}
+
+.addOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.addOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-full);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  font-size: var(--fs-sm);
+  transition: transform 0.14s ease;
+}
+
+.addOption:active {
+  transform: scale(0.96);
+}
+
+/* ---------- 错误态 ---------- */
+.errorBox {
+  padding: var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: center;
+  box-shadow: var(--shadow-xs);
+}
+
+.errorGlyph {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--paper-sunken);
+  border: 1px solid var(--paper-line);
+}
+
+.errorIcon {
+  color: var(--moss);
+}
+
+.statusTitle {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.note {
+  font-size: var(--fs-xs);
+  color: var(--ink-mute);
+  line-height: 1.7;
+}
+
+.photoActions {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.retake {
+  flex: 1;
+}
+
+.footerBtn {
+  flex: 1;
+}
+
+@keyframes spoon-pulse {
+  0%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

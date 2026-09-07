@@ -1,0 +1,146 @@
+.tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  text-align: left;
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.14s ease,
+    box-shadow 0.2s ease;
+}
+
+/* 左边一道极淡的食材色，让每张卡片有自己的气质 */
+.tile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent, var(--moss));
+  opacity: 0.85;
+}
+
+.tile:active {
+  transform: scale(0.99);
+}
+
+.selected {
+  border-color: color-mix(in srgb, var(--accent, var(--moss)) 55%, var(--paper-line));
+  background: var(--moss-tint);
+  box-shadow: var(--shadow-xs);
+}
+
+.unselected {
+  opacity: 0.55;
+}
+
+.thumb {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.name {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.note {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+  line-height: 1.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  min-width: 46px;
+}
+
+.conf {
+  font-size: var(--fs-xs);
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  width: 46px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--paper-sunken);
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent, var(--moss));
+}
+
+.check {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-faint);
+  display: grid;
+  place-items: center;
+  color: transparent;
+  transition: all 0.2s ease;
+}
+
+.checkOn {
+  background: var(--accent, var(--moss));
+  border-color: var(--accent, var(--moss));
+  color: #fff;
+}
+
+.remove {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink-mute);
+}
+
+.remove:active {
+  background: var(--paper-sunken);
+}

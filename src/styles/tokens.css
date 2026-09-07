@@ -1,0 +1,99 @@
+/**
+ * 识朴 Spoon · 设计变量（简洁 / 温暖 / 轻盈 · AI 厨房助手）
+ * 浅暖白纸底、深灰墨字、低饱和自然绿强调色；
+ * 中等圆角、极轻阴影、无复杂渐变、无装饰插画。
+ */
+
+:root {
+  /* ---------- 纸：浅暖白，干净透气 ---------- */
+  --paper: #f5f2ec;          /* 主背景：浅暖白 */
+  --paper-raised: #fbfaf6;    /* 抬升面：比纸面更亮一点 */
+  --paper-sunken: #ece8df;    /* 凹陷：略深的暖灰 */
+  --paper-line: #e7e2d8;      /* 发丝线 / 细边框 */
+  --paper-warm: #f1ece2;      /* 暖区块 */
+
+  /* ---------- 墨：深灰，不是纯黑也不是棕 ---------- */
+  --ink: #34332f;            /* 正文主墨色（深灰） */
+  --ink-soft: #5e5b54;       /* 次级文字 */
+  --ink-mute: #8b867b;       /* 辅助说明 */
+  --ink-faint: #c3bdb0;      /* 最弱的线 / 占位 */
+
+  /* ---------- 主色：低饱和自然绿（鼠尾草） ---------- */
+  --moss: #6f856f;           /* 强调色：低饱和自然绿 */
+  --moss-deep: #4f6651;      /* 强调色按下 / 深一档 */
+  --moss-soft: #e8ede8;      /* 极淡绿填充 */
+  --moss-tint: rgba(111, 133, 111, 0.1);
+
+  /* ---------- 点缀：极度克制的暖色，仅用于小状态 ---------- */
+  --clay: #c08a63;           /* 暖橘（仅小状态用） */
+  --clay-deep: #9c6c47;
+  --clay-soft: #f3e8dc;
+  --berry: #b06f78;          /* 收藏（低饱和玫） */
+
+  /* ---------- 语义色 ---------- */
+  --danger: #b07a5f;
+  --success: #6f8173;
+
+  /* ---------- 圆角：中等、统一、柔和 ---------- */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 24px;
+  --r-full: 999px;
+
+  /* ---------- 间距（8pt 节奏，留白充足） ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 28px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ---------- 字体（衬线标题给温度，现代无衬线正文保简洁） ---------- */
+  --font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'STSong', 'Source Han Serif SC', 'Georgia',
+    'Times New Roman', serif;
+
+  /* 字号（标题用衬线，层级拉开；整体克制轻盈） */
+  --fs-xs: 11px;
+  --fs-sm: 12.5px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 28px;
+  --fs-display: 32px;
+
+  /* ---------- 层级 ---------- */
+  --z-tabbar: 100;
+  --z-header: 90;
+  --z-overlay: 200;
+  --z-toast: 300;
+
+  /* ---------- 布局 ---------- */
+  --app-max-w: 375px;
+  --tabbar-h: 56px;
+  --header-h: 50px;
+
+  /* ---------- 阴影：极轻、中性、不抢戏 ---------- */
+  --shadow-xs: 0 1px 2px rgba(52, 51, 47, 0.03);
+  --shadow-sm: 0 3px 10px rgba(52, 51, 47, 0.05);
+  --shadow-md: 0 8px 22px rgba(52, 51, 47, 0.06);
+  --shadow-lg: 0 16px 40px rgba(52, 51, 47, 0.08);
+
+  /* ---------- 发丝线 ---------- */
+  --line: rgba(52, 51, 47, 0.08);
+}
+
+/* iOS 安全区兜底：不支持 env() 时归零 */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
