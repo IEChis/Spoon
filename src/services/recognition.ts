@@ -25,14 +25,22 @@ export function recognizeIngredients(imageSeed: number): Promise<RecognitionResu
   });
 }
 
-/** 合并多张照片的识别结果：去重并保留最高置信度，默认全部选中 */
+/** 合并多张照片的识别结果：去重并保留最高置信度，数量跨照片求和，默认全部选中 */
 export function mergeRecognitions(results: RecognitionResult[]): RecognitionResult {
   const map = new Map<string, RecognizedIngredient>();
   results.forEach((result) => {
     result.items.forEach((item) => {
       const existing = map.get(item.id);
-      if (!existing || item.confidence > existing.confidence) {
+      if (!existing) {
         map.set(item.id, { ...item, selected: true });
+      } else {
+        // 保留更高置信度，数量相加（拍了多张同一食材即视作更多份）
+        map.set(item.id, {
+          ...item,
+          confidence: Math.max(existing.confidence, item.confidence),
+          selected: true,
+          quantity: existing.quantity + item.quantity,
+        });
       }
     });
   });

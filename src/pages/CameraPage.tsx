@@ -106,7 +106,7 @@ export default function CameraPage() {
           onClick={handleGallery}
           aria-label="从相册选择"
         >
-          <Icon name="grid" size={20} />
+          <Icon name="image" size={20} />
         </button>
 
         <button

@@ -1,12 +1,16 @@
+/* ============================================================
+   首页 · 安静、自然、有呼吸感
+   结构：标题 → 留白 → 圆形拍食材【主】→ 留白 → 菜篮子卡片【次】→ 留白 → TabBar
+   ============================================================ */
+
 .home {
   position: relative;
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  padding: var(--sp-7) var(--sp-6) var(--sp-5);
 }
 
-/* ---------- 顶部：一句轻量引导 ---------- */
+/* ---------- 顶部：标题与简短说明（占用克制） ---------- */
 .intro {
   display: flex;
   flex-direction: column;
@@ -28,160 +32,236 @@
   line-height: 1.7;
 }
 
-/* ---------- 中央：唯一核心行为 —— 拍食材 ---------- */
+/* ---------- 中间：圆形拍食材主入口 ---------- */
 .capture {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--sp-5);
-  padding: var(--sp-8) 0;
+  /* 与标题拉开、与底部卡片也拉开，形成明显呼吸空间 */
+  margin-top: clamp(28px, 8vh, 56px);
+  margin-bottom: clamp(28px, 8vh, 56px);
 }
 
 .captureBtn {
   position: relative;
-  width: 152px;
-  height: 152px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  width: 148px;
+  height: 148px;
   border-radius: 50%;
   background: var(--moss);
   color: #fff;
+  display: grid;
+  place-items: center;
   box-shadow: var(--shadow-md);
-  animation: spoon-breathe 3.8s ease-in-out infinite;
+  overflow: visible;
+  transition: transform 0.18s ease, background-color 0.2s ease;
 }
 
 .captureBtn:active {
-  animation: none;
-  transform: scale(0.96);
+  transform: scale(0.97);
   background: var(--moss-deep);
-  box-shadow: var(--shadow-sm);
 }
 
-/* 呼吸光环：极轻，只做「活着」的暗示 */
-.captureHalo {
+/* 极轻、不规则、自然呼吸的边缘扩散（不抢戏、不发光、不影响点击） */
+.captureBtn::before,
+.captureBtn::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid var(--moss);
-  opacity: 0.3;
+  left: 50%;
+  top: 50%;
   pointer-events: none;
-  animation: spoon-halo 3.8s ease-in-out infinite;
+  z-index: -1;
+  background: var(--moss);
+  filter: blur(7px);
 }
 
-.captureBtnText {
-  position: relative;
-  font-family: var(--font-serif);
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-indent: 0.14em;
-  color: #fff;
+.captureBtn::before {
+  width: 104%;
+  height: 104%;
+  transform: translate(-50%, -50%);
+  opacity: 0.12;
+  border-radius: 46% 54% 52% 48% / 49% 47% 53% 51%;
+  animation: haloA 4.6s ease-in-out infinite;
 }
 
-.captureAlt {
-  font-size: var(--fs-sm);
-  color: var(--ink-mute);
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.captureBtn::after {
+  width: 122%;
+  height: 122%;
+  transform: translate(-50%, -50%);
+  opacity: 0.08;
+  border-radius: 50% 50% 48% 52% / 52% 48% 50% 50%;
+  animation: haloB 6s ease-in-out infinite reverse;
 }
 
-.captureAlt:active {
-  color: var(--ink-soft);
-}
-
-@keyframes spoon-breathe {
-  0%,
-  100% {
-    transform: scale(1);
+@keyframes haloA {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.12;
+    border-radius: 46% 54% 52% 48% / 49% 47% 53% 51%;
   }
   50% {
-    transform: scale(1.025);
-  }
-}
-
-@keyframes spoon-halo {
-  0% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  70% {
-    transform: scale(1.16);
-    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 0.05;
+    border-radius: 53% 47% 48% 52% / 47% 53% 49% 51%;
   }
   100% {
-    transform: scale(1.16);
-    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.12;
+    border-radius: 46% 54% 52% 48% / 49% 47% 53% 51%;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .captureBtn,
-  .captureHalo {
-    animation: none;
+@keyframes haloB {
+  0% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.08;
+    border-radius: 50% 50% 48% 52% / 52% 48% 50% 50%;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.22);
+    opacity: 0.03;
+    border-radius: 47% 53% 51% 49% / 49% 51% 47% 53%;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.08;
+    border-radius: 50% 50% 48% 52% / 52% 48% 50% 50%;
   }
 }
 
-/* ---------- 底部：少量最近生成 ---------- */
-.recent {
-  margin-top: var(--sp-2);
-}
-
-.recentHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--sp-2);
-  padding: 0 2px;
-}
-
-.recentTitle {
-  font-size: var(--fs-xs);
-  letter-spacing: 0.18em;
-  color: var(--ink-mute);
-}
-
-.recentMore {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: var(--fs-sm);
-  color: var(--moss);
-}
-
-.recentList {
-  display: flex;
-  flex-direction: column;
-}
-
-.recentItem {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-3) 2px;
-  text-align: left;
-  border-top: 1px solid var(--line);
-}
-
-.recentName {
-  flex: 1;
+.captureTitle {
+  margin-top: var(--sp-4);
   font-family: var(--font-serif);
-  font-size: var(--fs-md);
-  font-weight: 500;
+  font-size: var(--fs-xl);
+  font-weight: 600;
   color: var(--ink);
 }
 
-.recentMeta {
+.captureHint {
+  margin-top: var(--sp-1);
   font-size: var(--fs-sm);
   color: var(--ink-mute);
 }
 
-.recentChevron {
-  color: var(--ink-faint);
-  flex: none;
+/* ---------- 下方：菜篮子状态卡片 → 直接生成菜谱 ---------- */
+.cook {
+  margin-top: auto;
+  padding-bottom: var(--sp-2);
+}
+
+.cookCard {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-4) var(--sp-5);
+  border-radius: var(--r-xl);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  overflow: visible;
+  transition: transform 0.16s ease, background-color 0.2s ease;
+  text-align: left;
+}
+
+.cookCard:active:not(:disabled) {
+  transform: scale(0.99);
+  background: var(--moss-soft);
+}
+
+/* 仅上侧边缘的轻微扩散（空气/水汽缓缓上升，不向左右与下方扩散） */
+.cookCard::before {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: -6px;
+  height: 30px;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    120% 95% at 50% 100%,
+    rgba(111, 133, 111, 0.16) 0%,
+    rgba(111, 133, 111, 0) 72%
+  );
+  border-radius: 56% 44% 50% 50% / 100% 100% 24% 24%;
+  filter: blur(6px);
+  animation: cookRise 5.4s ease-in-out infinite;
+}
+
+@keyframes cookRise {
+  0% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+}
+
+/* 顶部状态行：我的菜篮子 · N种食材 */
+.pantryStatus {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--ink-mute);
+}
+
+.pantryStatusIcon {
+  display: grid;
+  place-items: center;
+  color: var(--moss);
+}
+
+.pantryStatusText {
+  flex: 1;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.02em;
+}
+
+/* 主体文案 */
+.cookBody {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.cookText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.cookTitle {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cookSub {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+}
+
+.cookCardDisabled {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .captureBtn::before,
+  .captureBtn::after,
+  .cookCard::before {
+    animation: none;
+  }
 }

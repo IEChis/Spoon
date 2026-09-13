@@ -91,20 +91,22 @@ export function getIngredient(id: string): Ingredient {
 }
 
 /**
- * Mock 识别结果：固定返回 番茄 / 鸡蛋 / 小白菜 / 洋葱
+ * Mock 识别结果：固定返回 番茄 / 鸡蛋 / 小白菜 / 洋葱，并附带大致数量
  * 真实接入 API 时，只需让 recognition 服务返回同样结构即可。
  */
 export function buildMockRecognized(): RecognizedIngredient[] {
-  const fixed: Array<{ id: string; confidence: number }> = [
-    { id: 'tomato', confidence: 0.97 },
-    { id: 'egg', confidence: 0.94 },
-    { id: 'bokchoy', confidence: 0.88 },
-    { id: 'onion', confidence: 0.76 },
+  const fixed: Array<{ id: string; confidence: number; quantity: number; unit: string }> = [
+    { id: 'tomato', confidence: 0.97, quantity: 2, unit: '个' },
+    { id: 'egg', confidence: 0.94, quantity: 4, unit: '个' },
+    { id: 'bokchoy', confidence: 0.88, quantity: 1, unit: '把' },
+    { id: 'onion', confidence: 0.76, quantity: 1, unit: '个' },
   ];
 
-  return fixed.map(({ id, confidence }) => ({
+  return fixed.map(({ id, confidence, quantity, unit }) => ({
     ...getIngredient(id),
     confidence,
     selected: true,
+    quantity,
+    unit,
   }));
 }

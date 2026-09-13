@@ -99,20 +99,6 @@
   gap: var(--sp-3);
 }
 
-.stepNo {
-  font-family: var(--font-serif);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  line-height: 1;
-  color: var(--moss-deep);
-  letter-spacing: 0.08em;
-  padding: 5px 12px;
-  border-radius: var(--r-full);
-  background: var(--moss-soft);
-  animation: cookFade 0.5s ease both;
-  flex: none;
-}
-
 .title {
   font-family: var(--font-serif);
   font-size: clamp(32px, 9vw, 44px);

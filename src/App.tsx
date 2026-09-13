@@ -8,8 +8,16 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const body = document.querySelector('.screen__body');
-    if (body) body.scrollTop = 0;
+    const resetScroll = () => {
+      const body = document.querySelector('.screen__body');
+      if (body) body.scrollTop = 0;
+      window.scrollTo(0, 0);
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+    };
+    resetScroll();
+    // 等 DOM 绘制完成后再兜底一次，避免异步内容把页面顶下去
+    const raf = requestAnimationFrame(resetScroll);
+    return () => cancelAnimationFrame(raf);
   }, [pathname]);
 
   return null;

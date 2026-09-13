@@ -16,20 +16,35 @@ import type {
 
 export type RecognitionStatus = 'idle' | 'scanning' | 'done' | 'error';
 export type GenerationStatus = 'idle' | 'generating' | 'success' | 'empty' | 'error';
+/** 相机入口意图：做菜（识别后生成菜谱） / 采购（识别后只入菜篮子） */
+export type CaptureMode = 'cook' | 'purchase';
 
 interface AppStoreValue {
   /* ---- 识别流程 ---- */
   photoSeeds: number[];
   recognitionStatus: RecognitionStatus;
   recognition: RecognitionResult | null;
+  /** 本次拍照的意图：做菜 / 记录采购 */
+  captureMode: CaptureMode;
+  setCaptureMode: (mode: CaptureMode) => void;
   /** 开始一次新的识别（传入所有已拍/已上传的照片种子） */
   startRecognition: (seeds: number[]) => void;
   /** 重新识别当前所有照片 */
   retryRecognition: () => void;
   /** 勾选 / 取消某个识别结果 */
   toggleRecognized: (id: string) => void;
+  /** 调整某个识别结果的数量 */
+  setRecognizedQuantity: (id: string, quantity: number) => void;
   /** 手动补充一个未被识别出的食材 */
   addRecognized: (ingredientId: string) => void;
+  /** 把识别结果写入菜篮子（合并存量，采购/做菜都会先记录） */
+  recordToPantry: (items: Ingredient[]) => void;
+  /** 直接用当前菜篮子生成一道菜 */
+  generateFromPantry: () => void;
+  /** 先把识别到的食材合并（数量累加）进菜篮子，再以合并后的完整菜篮子生成菜谱 */
+  generateFromMerged: (items: Array<Ingredient & { quantity?: number; unit?: string }>) => void;
+  /** 做完一道菜后，按菜谱食材扣减菜篮子存量（归零自动移除） */
+  consumeRecipe: (recipe: Recipe) => void;
 
   /* ---- 菜谱生成 ---- */
   confirmedIngredients: Ingredient[];
@@ -65,7 +80,14 @@ interface AppStoreValue {
 
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
-const INITIAL_PANTRY_IDS = ['tomato', 'egg', 'bokchoy', 'noodle', 'scallion'];
+/** 初始菜篮子：带初始存量，便于演示「做完菜消耗 / 归零自动删除」 */
+const INITIAL_PANTRY: Array<{ id: string; stock: number; unit: string }> = [
+  { id: 'tomato', stock: 2, unit: '个' },
+  { id: 'egg', stock: 4, unit: '个' },
+  { id: 'bokchoy', stock: 2, unit: '把' },
+  { id: 'noodle', stock: 1, unit: '把' },
+  { id: 'scallion', stock: 3, unit: '根' },
+];
 
 const INITIAL_SEASONING_IDS = ['salt', 'soysauce', 'sugar', 'vinegar', 'sesameoil', 'pepper'];
 
@@ -92,6 +114,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [photoSeeds, setPhotoSeeds] = useState<number[]>([]);
   const [recognitionStatus, setRecognitionStatus] = useState<RecognitionStatus>('idle');
   const [recognition, setRecognition] = useState<RecognitionResult | null>(null);
+  const [captureMode, setCaptureMode] = useState<CaptureMode>('cook');
 
   /* ---------- 生成流程 ---------- */
   const [confirmedIngredients, setConfirmedIngredients] = useState<Ingredient[]>([]);
@@ -101,7 +124,11 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   /* ---------- 个人数据 ---------- */
   const [pantry, setPantry] = useState<Ingredient[]>(() =>
-    INITIAL_PANTRY_IDS.map(getIngredient),
+    INITIAL_PANTRY.map(({ id, stock, unit }) => ({
+      ...getIngredient(id),
+      stock,
+      stockUnit: unit,
+    })),
   );
   const [seasonings, setSeasonings] = useState<Seasoning[]>(() =>
     INITIAL_SEASONING_IDS.map(getSeasoning),
@@ -168,6 +195,20 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const setRecognizedQuantity = useCallback((id: string, quantity: number) => {
+    const next = Math.max(1, quantity);
+    setRecognition((prev) =>
+      prev
+        ? {
+            ...prev,
+            items: prev.items.map((item) =>
+              item.id === id ? { ...item, quantity: next } : item,
+            ),
+          }
+        : prev,
+    );
+  }, []);
+
   const addRecognized = useCallback((ingredientId: string) => {
     setRecognition((prev) => {
       if (!prev) return prev;
@@ -176,6 +217,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         ...getIngredient(ingredientId),
         confidence: 1,
         selected: true,
+        quantity: 1,
+        unit: '份',
       };
       return { ...prev, items: [...prev.items, next] };
     });
@@ -265,6 +308,54 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     runGeneration(confirmedIngredients);
   }, [confirmedIngredients, generationStatus, runGeneration]);
 
+  /** 直接用当前菜篮子里的食材生成一道菜 */
+  const generateFromPantry = useCallback(() => {
+    if (pantry.length === 0) return;
+    const items: Ingredient[] = pantry.map((p) => ({ ...p }));
+    setConfirmedIngredients(items);
+    resetGeneration();
+    runGeneration(items);
+  }, [pantry, resetGeneration, runGeneration]);
+
+  /**
+   * 识别结果页「生成今日菜谱」专用：
+   * 先把本次识别到的食材合并（数量累加）进菜篮子，再以合并后的完整菜篮子
+   * 作为生成输入。即「先更新菜篮子，再基于更新后的完整菜篮子生成菜谱」。
+   */
+  const generateFromMerged = useCallback(
+    (items: Array<Ingredient & { quantity?: number; unit?: string }>) => {
+      if (items.length === 0) return;
+      // 合并进菜篮子（已存在的按数量累加，不存在的新建）
+      const map = new Map(pantry.map((p) => [p.id, { ...p }]));
+      items.forEach((item) => {
+        const qty = item.stock ?? item.quantity ?? 1;
+        const unit = item.stockUnit ?? item.unit ?? '份';
+        const existing = map.get(item.id);
+        if (existing) {
+          existing.stock = (existing.stock ?? 1) + qty;
+          existing.stockUnit = unit;
+        } else {
+          map.set(item.id, { ...item, stock: qty, stockUnit: unit });
+        }
+      });
+      const merged = Array.from(map.values());
+      setPantry(merged);
+      // 以合并后的完整菜篮子作为生成输入
+      const base: Ingredient[] = merged.map(({ id, name, color, category, note }) => ({
+        id,
+        name,
+        color,
+        category,
+        note,
+        shelfLifeDays: getIngredient(id).shelfLifeDays,
+      }));
+      setConfirmedIngredients(base);
+      resetGeneration();
+      runGeneration(base);
+    },
+    [pantry, resetGeneration, runGeneration],
+  );
+
   /* ============================================================
      个人数据
      ============================================================ */
@@ -276,6 +367,42 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const removeFromPantry = useCallback((ingredientId: string) => {
     setPantry((prev) => prev.filter((item) => item.id !== ingredientId));
+  }, []);
+
+  /**
+   * 把识别到的食材写入菜篮子：已存在的按数量累加，不存在的新建。
+   * 这样「识图」这一步就完成了食材与数量的记录（采购 / 做菜都会先走这里）。
+   */
+  const recordToPantry = useCallback(
+    (items: Array<Ingredient & { quantity?: number; unit?: string }>) => {
+    setPantry((prev) => {
+      const map = new Map(prev.map((p) => [p.id, { ...p }]));
+      items.forEach((item) => {
+        const qty = item.stock ?? item.quantity ?? 1;
+        const unit = item.stockUnit ?? item.unit ?? '份';
+        const existing = map.get(item.id);
+        if (existing) {
+          existing.stock = (existing.stock ?? 1) + qty;
+          existing.stockUnit = unit;
+        } else {
+          map.set(item.id, { ...item, stock: qty, stockUnit: unit });
+        }
+      });
+      return Array.from(map.values());
+    });
+  }, []);
+
+  /**
+   * 做完一道菜后按菜谱食材扣减菜篮子存量；扣到 0 自动移除该项。
+   * 仅在菜篮子中存在、且菜谱用到的食材上扣减，每份用掉 1 单位。
+   */
+  const consumeRecipe = useCallback((recipe: Recipe) => {
+    const ids = new Set(recipe.ingredientIds);
+    setPantry((prev) =>
+      prev
+        .map((p) => (ids.has(p.id) ? { ...p, stock: (p.stock ?? 1) - 1 } : p))
+        .filter((p) => (p.stock ?? 0) > 0),
+    );
   }, []);
 
   const addCustomIngredient = useCallback((name: string) => {
@@ -290,6 +417,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         category: 'other',
         note: '',
         shelfLifeDays: 3,
+        stock: 1,
+        stockUnit: '份',
       };
       return [...prev, next];
     });
@@ -375,10 +504,17 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       photoSeeds,
       recognitionStatus,
       recognition,
+      captureMode,
+      setCaptureMode,
       startRecognition,
       retryRecognition,
       toggleRecognized,
+      setRecognizedQuantity,
       addRecognized,
+      recordToPantry,
+      generateFromPantry,
+      generateFromMerged,
+      consumeRecipe,
 
       confirmedIngredients,
       generationStatus,
@@ -407,10 +543,17 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       photoSeeds,
       recognitionStatus,
       recognition,
+      captureMode,
+      setCaptureMode,
       startRecognition,
       retryRecognition,
       toggleRecognized,
+      setRecognizedQuantity,
       addRecognized,
+      recordToPantry,
+      generateFromPantry,
+      generateFromMerged,
+      consumeRecipe,
       confirmedIngredients,
       generationStatus,
       aiRecipe,

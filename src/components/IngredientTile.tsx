@@ -13,6 +13,12 @@ interface IngredientTileProps {
   showConfidence?: boolean;
   /** 错落出现的动画延迟序号 */
   index?: number;
+  /** 识别数量（带步进器时显示） */
+  quantity?: number;
+  /** 数量单位 */
+  unit?: string;
+  /** 数量变化回调（− / + 触发，传入新数量） */
+  onQuantityChange?: (id: string, next: number) => void;
 }
 
 export function IngredientTile({
@@ -21,8 +27,12 @@ export function IngredientTile({
   onRemove,
   showConfidence = true,
   index = 0,
+  quantity,
+  unit,
+  onQuantityChange,
 }: IngredientTileProps) {
   const percent = Math.round(item.confidence * 100);
+  const showStepper = quantity !== undefined && onQuantityChange;
 
   const styleVars = {
     '--accent': item.color,
@@ -46,13 +56,39 @@ export function IngredientTile({
         <p className={styles.note}>{item.note}</p>
       </button>
 
-      {showConfidence && (
-        <div className={styles.meta}>
-          <span className={styles.conf}>{percent}%</span>
-          <span className={styles.bar}>
-            <span className={styles.barFill} style={{ width: `${percent}%` }} />
+      {showStepper ? (
+        <div className={styles.stepper} role="group" aria-label={`${item.name} 数量`}>
+          <button
+            type="button"
+            className={styles.stepBtn}
+            onClick={() => onQuantityChange?.(item.id, (quantity ?? 1) - 1)}
+            disabled={(quantity ?? 1) <= 1}
+            aria-label={`减少${item.name}数量`}
+          >
+            <Icon name="minus" size={13} strokeWidth={2.4} />
+          </button>
+          <span className={styles.stepVal}>
+            {quantity}
+            <span className={styles.stepUnit}>{unit}</span>
           </span>
+          <button
+            type="button"
+            className={styles.stepBtn}
+            onClick={() => onQuantityChange?.(item.id, (quantity ?? 1) + 1)}
+            aria-label={`增加${item.name}数量`}
+          >
+            <Icon name="plus" size={13} strokeWidth={2.4} />
+          </button>
         </div>
+      ) : (
+        showConfidence && (
+          <div className={styles.meta}>
+            <span className={styles.conf}>{percent}%</span>
+            <span className={styles.bar}>
+              <span className={styles.barFill} style={{ width: `${percent}%` }} />
+            </span>
+          </div>
+        )
       )}
 
       <button

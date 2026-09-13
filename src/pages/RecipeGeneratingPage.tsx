@@ -23,6 +23,7 @@ export default function RecipeGeneratingPage() {
     generationStatus,
     aiRecipe,
     generationError,
+    photoSeeds,
     regenerate,
     resetFlow,
   } = useAppStore();
@@ -84,15 +85,15 @@ export default function RecipeGeneratingPage() {
   /* ---------------- Empty 状态（生成确实结束且无结果，才允许出现） ---------------- */
   if (generationStatus === 'empty') {
     return (
-      <AppShell
-        header={<ScreenHeader title="菜谱" back onBack={() => navigate('/recognition')} />}
-        className="fade-up"
-      >
-        <div className={styles.resultWrap}>
-          <span className={styles.resultDeco}>
-            <Icon name="leaf" size={28} strokeWidth={1.5} />
-          </span>
-          <p className={styles.resultTitle}>今天的食材有点难搭配</p>
+        <AppShell
+          header={<ScreenHeader title="菜谱" back onBack={() => navigate(photoSeeds.length > 0 ? '/recognition' : '/')} />}
+          className="fade-up"
+        >
+          <div className={styles.resultWrap}>
+            <span className={styles.resultDeco}>
+              <Icon name="leaf" size={28} strokeWidth={1.5} />
+            </span>
+            <p className={styles.resultTitle}>今天的食材有点难搭配</p>
           <p className={styles.resultDesc}>换一组食材试试，识朴会再帮你想想。</p>
           <Button onClick={handleReshoot}>换一组食材</Button>
         </div>
@@ -103,15 +104,15 @@ export default function RecipeGeneratingPage() {
   /* ---------------- Error 状态 ---------------- */
   if (generationStatus === 'error') {
     return (
-      <AppShell
-        header={<ScreenHeader title="菜谱" back onBack={() => navigate('/recognition')} />}
-        className="fade-up"
-      >
-        <div className={styles.resultWrap}>
-          <span className={styles.resultDeco}>
-            <Icon name="leaf" size={28} strokeWidth={1.5} />
-          </span>
-          <p className={styles.resultTitle}>好像出了点小问题</p>
+        <AppShell
+          header={<ScreenHeader title="菜谱" back onBack={() => navigate(photoSeeds.length > 0 ? '/recognition' : '/')} />}
+          className="fade-up"
+        >
+          <div className={styles.resultWrap}>
+            <span className={styles.resultDeco}>
+              <Icon name="leaf" size={28} strokeWidth={1.5} />
+            </span>
+            <p className={styles.resultTitle}>好像出了点小问题</p>
           <p className={styles.resultDesc}>{generationError ?? '请再试一次。'}</p>
           <Button onClick={handleRetry}>
             {confirmedIngredients.length > 0 ? '再试一次' : '重新拍食材'}
@@ -128,7 +129,7 @@ export default function RecipeGeneratingPage() {
         <ScreenHeader
           title="正在为你生成菜谱"
           back
-          onBack={() => navigate('/recognition', { replace: true })}
+          onBack={() => navigate(photoSeeds.length > 0 ? '/recognition' : '/')}
         />
       }
       showTabBar={false}

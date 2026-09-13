@@ -18,13 +18,15 @@ import styles from './CookingPage.module.css';
 export default function CookingPage() {
   const { recipeId } = useParams<{ recipeId?: string }>();
   const navigate = useNavigate();
-  const { aiRecipe } = useAppStore();
+  const { aiRecipe, consumeRecipe } = useAppStore();
 
   const isAiFlow = !recipeId;
   const recipe: Recipe | undefined = recipeId ? getRecipe(recipeId) : aiRecipe ?? undefined;
 
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
+  /** 保证一道菜只消耗一次库存 */
+  const consumedRef = useRef(false);
 
   const touchX = useRef<number | null>(null);
   const onTouchStart = (e: TouchEvent) => {
@@ -57,8 +59,13 @@ export default function CookingPage() {
 
   const next = () => {
     if (done) return;
-    if (isLast) setDone(true);
-    else setStep((s) => Math.min(s + 1, total - 1));
+    if (isLast) {
+      if (!consumedRef.current && recipe) {
+        consumeRecipe(recipe);
+        consumedRef.current = true;
+      }
+      setDone(true);
+    } else setStep((s) => Math.min(s + 1, total - 1));
   };
   const prev = () => setStep((s) => Math.max(s - 1, 0));
   const exit = () => navigate(isAiFlow ? '/recipe' : `/recipe/${recipe.id}`);
@@ -113,9 +120,6 @@ export default function CookingPage() {
 
       {/* 主舞台：一步一页（可左右滑动），纯文字、大字号、清晰 */}
       <main className={styles.stage} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <span className={styles.stepNo} key={`n-${current.index}`}>
-          {String(current.index).padStart(2, '0')}
-        </span>
         <h2 className={styles.title} key={`t-${current.index}`}>
           {current.title}
         </h2>

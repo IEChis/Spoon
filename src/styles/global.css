@@ -153,8 +153,14 @@ img {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: var(--sp-5) var(--sp-5);
   padding-bottom: calc(var(--sp-10) + var(--safe-bottom));
+}
+
+.screen__body::-webkit-scrollbar {
+  display: none;
 }
 
 .screen__body--flush {

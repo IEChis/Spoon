@@ -107,16 +107,14 @@
   padding: var(--sp-4);
   height: 320px;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .kitchenBody::-webkit-scrollbar {
-  width: 4px;
-}
-
-.kitchenBody::-webkit-scrollbar-thumb {
-  background: var(--paper-line);
-  border-radius: 2px;
+  display: none;
 }
 
 .kitchenDot {
@@ -160,6 +158,21 @@
   font-size: var(--fs-md);
   color: var(--ink);
   white-space: nowrap;
+}
+
+.kmStock {
+  flex: none;
+  min-width: 30px;
+  height: 22px;
+  padding: 0 8px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--r-full);
+  background: var(--moss-soft);
+  color: var(--moss-deep);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .kmRemove {

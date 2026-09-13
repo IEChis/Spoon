@@ -273,6 +273,150 @@
   flex: 1;
 }
 
+.footerActions {
+  display: flex;
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+/* 已存在食材冲突确认面板 */
+.conflictPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+  border: 1px solid var(--paper-line);
+  animation: spoon-fade-up 0.24s ease both;
+}
+
+.conflictTitle {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.conflictList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.conflictItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+}
+
+.conflictName {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.conflictStock {
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--moss-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.conflictNote {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-mute);
+  line-height: 1.6;
+}
+
+.conflictActions {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.conflictActions > * {
+  flex: 1;
+}
+
+/* 采购模式：记录成功面板 */
+.recordedPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-7) var(--sp-4);
+  text-align: center;
+  animation: cookFade 0.4s ease both;
+}
+
+.recordedGlyph {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--moss-soft);
+  color: var(--moss-deep);
+}
+
+.recordedTitle {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.recordedSub {
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+  line-height: 1.6;
+  max-width: 18em;
+}
+
+.recordedList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  max-width: 22em;
+}
+
+.recordedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--r-full);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  font-size: var(--fs-sm);
+  color: var(--ink);
+}
+
+.recordedQty {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--moss-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.recordedActions {
+  display: flex;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: 22em;
+  margin-top: var(--sp-2);
+}
+
+.recordedActions > * {
+  flex: 1;
+}
+
 @keyframes spoon-pulse {
   0%,
   100% {

@@ -144,3 +144,53 @@
 .remove:active {
   background: var(--paper-sunken);
 }
+
+/* 数量步进器（识别确认页用） */
+.stepper {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px;
+  border-radius: var(--r-full);
+  background: var(--paper-sunken);
+  border: 1px solid var(--paper-line);
+}
+
+.stepBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--moss-deep);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+  transition: transform 0.12s ease, background-color 0.18s ease;
+}
+
+.stepBtn:active {
+  transform: scale(0.92);
+  background: var(--moss-soft);
+}
+
+.stepBtn:disabled {
+  color: var(--ink-faint);
+  background: var(--paper-sunken);
+}
+
+.stepVal {
+  min-width: 30px;
+  text-align: center;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepUnit {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-mute);
+  margin-left: 2px;
+}

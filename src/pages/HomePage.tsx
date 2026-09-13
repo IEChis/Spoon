@@ -2,85 +2,73 @@ import { useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/AppShell';
 import { Icon } from '@/components/Icon';
 import { useAppStore } from '@/store/AppStore';
-import { RECIPES, getRecipe } from '@/mock/recipes';
 import styles from './HomePage.module.css';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { history } = useAppStore();
+  const { pantry, setCaptureMode, generateFromPantry } = useAppStore();
 
-  // 最近生成：优先展示真实历史，空则用示例菜谱兜底，保证 Demo 不空
-  const recent = (
-    history.length > 0
-      ? history.slice(0, 3).map((h) => getRecipe(h.recipeId)).filter(Boolean)
-      : RECIPES.slice(0, 3)
-  ) as NonNullable<ReturnType<typeof getRecipe>>[];
+  const cookFromPantry = () => {
+    if (pantry.length === 0) return;
+    generateFromPantry();
+    navigate('/recipe/generating');
+  };
 
   return (
     <AppShell showTabBar className="fade-up">
       <div className={styles.home}>
-        {/* 顶部：一句轻量引导 */}
+        {/* 顶部：标题与简短说明 */}
         <header className={styles.intro}>
           <h1 className={styles.title}>今天吃什么？</h1>
           <p className={styles.sub}>拍下手边的食材，剩下的我们一起来。</p>
         </header>
 
-        {/* 中央：唯一核心行为 —— 拍食材 */}
-        <div className={styles.capture}>
+        {/* 中间：圆形拍食材主入口 */}
+        <section className={styles.capture} aria-label="拍食材">
           <button
             type="button"
             className={styles.captureBtn}
-            onClick={() => navigate('/camera')}
+            onClick={() => {
+              setCaptureMode('cook');
+              navigate('/camera');
+            }}
             aria-label="拍食材"
           >
-            <span className={styles.captureHalo} aria-hidden="true" />
-            <Icon name="camera" size={38} strokeWidth={1.5} />
-            <span className={styles.captureBtnText}>拍食材</span>
+            <Icon name="camera" size={34} strokeWidth={1.5} />
           </button>
+          <span className={styles.captureTitle}>拍食材</span>
+          <span className={styles.captureHint}>识别手边的食材</span>
+        </section>
 
+        {/* 下方：菜篮子状态卡片 → 直接生成菜谱 */}
+        <section className={styles.cook} aria-label="直接生成菜谱">
           <button
             type="button"
-            className={styles.captureAlt}
-            onClick={() => navigate('/camera')}
+            className={`${styles.cookCard} ${pantry.length === 0 ? styles.cookCardDisabled : ''}`}
+            onClick={cookFromPantry}
+            disabled={pantry.length === 0}
+            title={pantry.length === 0 ? '菜篮子还是空的，先记录点食材吧' : undefined}
+            aria-label="直接生成菜谱"
           >
-            也可以从相册选择
-          </button>
-        </div>
-
-        {/* 底部：少量最近生成 */}
-        <section className={styles.recent}>
-          <div className={styles.recentHead}>
-            <span className={styles.recentTitle}>最近生成</span>
-            <button
-              type="button"
-              className={styles.recentMore}
-              onClick={() => navigate('/recipes')}
-            >
-              全部
+            {/* 顶部状态行：我的菜篮子 · N种食材 */}
+            <span className={styles.pantryStatus}>
+              <span className={styles.pantryStatusIcon}>
+                <Icon name="basket" size={14} strokeWidth={1.6} />
+              </span>
+              <span className={styles.pantryStatusText}>
+                我的菜篮子 · {pantry.length} 种食材
+              </span>
               <Icon name="chevronRight" size={14} strokeWidth={1.8} />
-            </button>
-          </div>
+            </span>
 
-          <ul className={styles.recentList}>
-            {recent.map((r) => (
-              <li key={r.id}>
-                <button
-                  type="button"
-                  className={styles.recentItem}
-                  onClick={() => navigate(`/recipe/${r.id}`)}
-                >
-                  <span className={styles.recentName}>{r.name}</span>
-                  <span className={styles.recentMeta}>{r.timeMin} 分钟</span>
-                  <Icon
-                    name="chevronRight"
-                    size={16}
-                    strokeWidth={1.8}
-                    className={styles.recentChevron}
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
+            {/* 主体文案 */}
+            <span className={styles.cookBody}>
+              <span className={styles.cookText}>
+                <span className={styles.cookTitle}>直接生成菜谱</span>
+                <span className={styles.cookSub}>从我的菜篮子开始</span>
+              </span>
+            </span>
+          </button>
         </section>
       </div>
     </AppShell>

@@ -22,6 +22,10 @@ export interface Ingredient {
   note: string;
   /** 常温 / 冷藏建议存放天数 */
   shelfLifeDays: number;
+  /** 菜篮子中的存量（仅菜篮子场景用到，目录 / 识别里可不传） */
+  stock?: number;
+  /** 存量单位，如 个 / 把 / 根，缺省为 份 */
+  stockUnit?: string;
 }
 
 /** AI 识别出的单个食材：在食材基础上附带置信度与是否采纳 */
@@ -30,6 +34,10 @@ export interface RecognizedIngredient extends Ingredient {
   confidence: number;
   /** 用户在确认页是否勾选 */
   selected: boolean;
+  /** 识别到的大致数量（如 番茄 ×2） */
+  quantity: number;
+  /** 数量单位，如 个 / 把 / 根 */
+  unit: string;
 }
 
 /** 一次识别会话的结果 */

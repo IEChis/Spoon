@@ -18,6 +18,8 @@ interface KitchenManagerProps<T extends { id: string; name: string }> {
   onRemove: (id: string) => void;
   isEditing: boolean;
   emptyHint: string;
+  /** 名称后追加的元信息（如菜篮子存量） */
+  meta?: (item: T) => ReactNode;
   quickOptions: T[];
   renderOption: (item: T) => ReactNode;
   onAddOption: (item: T) => void;
@@ -33,6 +35,7 @@ function KitchenManager<T extends { id: string; name: string }>({
   onRemove,
   isEditing,
   emptyHint,
+  meta,
   quickOptions,
   renderOption,
   onAddOption,
@@ -51,6 +54,7 @@ function KitchenManager<T extends { id: string; name: string }>({
             <div key={item.id} className={styles.kmItem}>
               {renderItem(item)}
               <span className={styles.kmName}>{item.name}</span>
+              {meta ? meta(item) : null}
               {isEditing && (
                 <button
                   type="button"
@@ -241,6 +245,14 @@ export default function ProfilePage() {
                   onRemove={removeFromPantry}
                   isEditing={editingTab === 'pantry'}
                   emptyHint="还没有添加食材"
+                  meta={(item) =>
+                    item.stock !== undefined ? (
+                      <span className={styles.kmStock}>
+                        {item.stock}
+                        {item.stockUnit ?? '份'}
+                      </span>
+                    ) : null
+                  }
                   quickOptions={ALL_INGREDIENT_OPTIONS.filter((o) => !pantryIds.has(o.id))}
                   renderOption={(o) => <IngredientToken id={o.id} size={20} />}
                   onAddOption={(o) => addToPantry(o.id)}

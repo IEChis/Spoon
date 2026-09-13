@@ -251,7 +251,7 @@ export default function RecipePage() {
       header={
         <ScreenHeader
           back
-          onBack={() => (isAiFlow ? navigate('/recognition') : navigate(-1))}
+          onBack={() => (isAiFlow ? navigate('/') : navigate(-1))}
           right={headerBookmark}
         />
       }
