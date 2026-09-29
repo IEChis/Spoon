@@ -7,8 +7,8 @@ import { EmptyState } from '@/components/EmptyState';
 import { Icon } from '@/components/Icon';
 import { IngredientToken } from '@/components/IngredientToken';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { getIngredient } from '@/mock/ingredients';
 import { getRecipe } from '@/mock/recipes';
+import { formatAmount, scaleAmount } from '@/utils/servings';
 import { useAppStore } from '@/store/AppStore';
 import styles from './RecipePage.module.css';
 
@@ -35,6 +35,7 @@ export default function RecipePage() {
     pantry,
     favorites,
     toggleFavorite,
+    beginCooking,
   } = useAppStore();
 
   const [toast, setToast] = useState<string | null>(null);
@@ -44,14 +45,19 @@ export default function RecipePage() {
     window.setTimeout(() => setToast(null), 1800);
   };
 
-  /** 进入烹饪模式（一步一页） */
-  const startCooking = () => {
-    const targetId = recipeId ?? aiRecipe?.id;
-    navigate(targetId ? `/cooking/${targetId}` : '/cooking');
-  };
-
   const isAiFlow = !recipeId;
   const recipe = recipeId ? getRecipe(recipeId) : aiRecipe ?? undefined;
+
+  /** 当前选择的份数（本地状态，初始化自菜谱 servings；调整即时影响用量与库存对比） */
+  const [servings, setServings] = useState<number>(recipe?.servings ?? 2);
+  const clampServings = (n: number) => Math.max(1, Math.min(12, n));
+
+  /** 进入烹饪模式：先锁定本次份数与消耗量，再跳转 */
+  const startCooking = () => {
+    const targetId = recipeId ?? aiRecipe?.id;
+    if (recipe) beginCooking(recipe, servings);
+    navigate(targetId ? `/cooking/${targetId}` : '/cooking');
+  };
 
   /* ============================================================
      AI 流程状态分支
@@ -63,7 +69,7 @@ export default function RecipePage() {
   if (isAiFlow && generationStatus === 'empty') {
     return (
       <AppShell
-        header={<ScreenHeader title="菜谱" back onBack={() => navigate('/recognition')} />}
+        header={<ScreenHeader title="菜谱" back onBack={() => navigate(-1)} />}
         className="fade-up"
       >
         <EmptyState
@@ -80,7 +86,7 @@ export default function RecipePage() {
   if (isAiFlow && generationStatus === 'error') {
     return (
       <AppShell
-        header={<ScreenHeader title="菜谱" back onBack={() => navigate('/recognition')} />}
+        header={<ScreenHeader title="菜谱" back onBack={() => navigate(-1)} />}
         className="fade-up"
       >
         <EmptyState
@@ -131,7 +137,7 @@ export default function RecipePage() {
           <ScreenHeader
             title="正在为你生成菜谱"
             back
-            onBack={() => navigate('/recognition')}
+            onBack={() => navigate(-1)}
           />
         }
         className="fade-up"
@@ -147,7 +153,7 @@ export default function RecipePage() {
   if (!recipe) {
     return (
       <AppShell
-        header={<ScreenHeader title="菜谱" back onBack={() => navigate('/recipes')} />}
+        header={<ScreenHeader title="菜谱" back onBack={() => navigate(-1)} />}
         className="fade-up"
       >
         <EmptyState
@@ -161,13 +167,31 @@ export default function RecipePage() {
   }
 
   /* ---------------- 结果 ---------------- */
-  const pantryIds = new Set(pantry.map((i) => i.id));
-  const ingredients = recipe.ingredientIds.map(getIngredient);
   const favorited = favorites.includes(recipe.id);
+
+  /** 每个食材：缩放后用量 + 与当前库存的对比状态 */
+  const rows = recipe.ingredients.map((ing) => {
+    const need = scaleAmount(ing.baseAmount, recipe.baseServings, servings);
+    const pantryItem = pantry.find((p) => p.id === ing.ingredientId) ?? null;
+    const has = pantryItem != null;
+    const stock = pantryItem?.stock ?? 0;
+    let status: 'ok' | 'exact' | 'short' | 'missing';
+    let gap = 0;
+    if (!has) {
+      status = 'missing';
+      gap = need;
+    } else if (stock + 0.0001 >= need) {
+      status = Math.abs(stock - need) < 0.0001 ? 'exact' : 'ok';
+    } else {
+      status = 'short';
+      gap = need - stock;
+    }
+    return { ing, need, stock, has, status, gap, pantryItem };
+  });
 
   const stats = [
     { label: '时间', value: `${recipe.timeMin} 分钟` },
-    { label: '份量', value: `${recipe.servings} 人份` },
+    { label: '份量', value: `${servings} 人份` },
     { label: '难度', value: recipe.difficulty },
   ];
 
@@ -251,7 +275,7 @@ export default function RecipePage() {
       header={
         <ScreenHeader
           back
-          onBack={() => (isAiFlow ? navigate('/') : navigate(-1))}
+          onBack={() => navigate(-1)}
           right={headerBookmark}
         />
       }
@@ -281,23 +305,81 @@ export default function RecipePage() {
           ))}
         </div>
 
-        {/* 第四层：食材 */}
+        {/* 第四层：份数选择（即时影响用量与库存对比） */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>{isAiFlow ? '识别到的食材' : '食材'}</h2>
-          <div className={styles.ingredients}>
-            {ingredients.map((item) => {
-              const has = pantryIds.has(item.id);
+          <div className={styles.servingsRow}>
+            <span className={styles.servingsLabel}>几人份</span>
+            <div className={styles.stepper}>
+              <button
+                type="button"
+                className={styles.stepBtn}
+                onClick={() => setServings((s) => clampServings(s - 1))}
+                disabled={servings <= 1}
+                aria-label="减少份数"
+              >
+                −
+              </button>
+              <span className={styles.servingsVal}>{servings} 人份</span>
+              <button
+                type="button"
+                className={styles.stepBtn}
+                onClick={() => setServings((s) => clampServings(s + 1))}
+                disabled={servings >= 12}
+                aria-label="增加份数"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* 第五层：食材 & 本次需要 */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            {isAiFlow ? '识别到的食材' : '食材'}
+            <span className={styles.sectionSub}>本次需要 · {servings} 人份</span>
+          </h2>
+          <div className={styles.ingList}>
+            {rows.map(({ ing, need, stock, has, status, gap, pantryItem }) => {
+              const statusText =
+                status === 'ok'
+                  ? '✓ 库存充足'
+                  : status === 'exact'
+                    ? '刚好够用'
+                    : status === 'short'
+                      ? `还需 ${formatAmount(gap, ing.unit)}`
+                      : '需备';
               return (
-                <span
-                  key={item.id}
-                  className={`${styles.ingItem} ${has ? '' : styles.ingMissing}`}
+                <div
+                  key={ing.ingredientId}
+                  className={`${styles.ingRow} ${
+                    status === 'missing' || status === 'short' ? styles.ingRowWarn : ''
+                  }`}
                 >
-                  <span className={styles.ingIcon}>
-                    <IngredientToken id={item.id} size={22} />
+                  <span className={styles.ingName}>
+                    <IngredientToken id={ing.ingredientId} size={22} />
+                    {ing.name}
                   </span>
-                  {item.name}
-                  {!has && <span className={styles.ingFlag}>需备</span>}
-                </span>
+                  <span className={styles.ingAmount}>
+                    {ing.scalable ? formatAmount(need, ing.unit) : ing.note ?? '适量'}
+                  </span>
+                  <span className={styles.ingStock}>
+                    {has
+                      ? `库存 ${formatAmount(stock, pantryItem?.stockUnit ?? ing.unit)}`
+                      : '未入库'}
+                  </span>
+                  <span
+                    className={`${styles.ingStatus} ${
+                      status === 'ok' || status === 'exact'
+                        ? styles.statusOk
+                        : status === 'short'
+                          ? styles.statusShort
+                          : styles.statusMiss
+                    }`}
+                  >
+                    {statusText}
+                  </span>
+                </div>
               );
             })}
           </div>

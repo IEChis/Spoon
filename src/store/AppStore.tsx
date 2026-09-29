@@ -1,11 +1,14 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { INGREDIENTS, getIngredient } from '@/mock/ingredients';
 import { getCookware, getSeasoning } from '@/mock/kitchen';
 import { generateRecipe } from '@/services/recipe';
 import { recognizeIngredients, mergeRecognitions } from '@/services/recognition';
+import { buildConsumeList } from '@/utils/servings';
 import type {
+  ConsumeItem,
   Cookware,
+  CookingSession,
   HistoryEntry,
   Ingredient,
   Recipe,
@@ -43,8 +46,14 @@ interface AppStoreValue {
   generateFromPantry: () => void;
   /** 先把识别到的食材合并（数量累加）进菜篮子，再以合并后的完整菜篮子生成菜谱 */
   generateFromMerged: (items: Array<Ingredient & { quantity?: number; unit?: string }>) => void;
-  /** 做完一道菜后，按菜谱食材扣减菜篮子存量（归零自动移除） */
-  consumeRecipe: (recipe: Recipe) => void;
+
+  /* ---- 烹饪任务（CookingSession） ---- */
+  /** 当前正在进行的烹饪任务（开始烹饪时锁定份数与消耗量） */
+  currentCooking: CookingSession | null;
+  /** 开始烹饪：用菜谱与当前选定份数建立一次烹饪任务（覆盖上一次） */
+  beginCooking: (recipe: Recipe, servings: number) => void;
+  /** 完成烹饪：按当前 CookingSession 的消耗量扣减库存（同一任务只扣一次） */
+  completeCooking: () => void;
 
   /* ---- 菜谱生成 ---- */
   confirmedIngredients: Ingredient[];
@@ -393,17 +402,66 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /**
-   * 做完一道菜后按菜谱食材扣减菜篮子存量；扣到 0 自动移除该项。
-   * 仅在菜篮子中存在、且菜谱用到的食材上扣减，每份用掉 1 单位。
+   * 按一次烹饪任务的消耗量扣减菜篮子：
+   *  - 仅扣减菜篮子中存在、且本次计划消耗到的食材；
+   *  - 实际扣减量 = min(库存, 计划消耗量)，绝不出现负库存；
+   *  - 扣到 0 自动从「我的厨房」移除（沿用既有产品逻辑）；
+   *  - 单位不一致（如菜谱用 ml、库存用 L）时不强行扣减，避免数据错乱。
+   * 该函数是纯函数，基于入参 prev 推导，可安全重复调用。
    */
-  const consumeRecipe = useCallback((recipe: Recipe) => {
-    const ids = new Set(recipe.ingredientIds);
-    setPantry((prev) =>
-      prev
-        .map((p) => (ids.has(p.id) ? { ...p, stock: (p.stock ?? 1) - 1 } : p))
-        .filter((p) => (p.stock ?? 0) > 0),
-    );
+  const applyConsume = useCallback(
+    (prev: Ingredient[], items: ConsumeItem[]): Ingredient[] => {
+      const map = new Map(prev.map((p) => [p.id, { ...p }]));
+      items.forEach((item) => {
+        const cur = map.get(item.ingredientId);
+        if (!cur) return; // 不在厨房库存中，跳过
+        if (cur.stockUnit && item.unit && cur.stockUnit !== item.unit) return; // 单位不一致，不误扣
+        const deduct = Math.min(cur.stock ?? 0, item.amount);
+        const newStock = (cur.stock ?? 0) - deduct;
+        if (newStock <= 0.0001) {
+          map.delete(item.ingredientId); // 归零移除
+        } else {
+          cur.stock = Math.round(newStock * 100) / 100; // 消除浮点尾差
+          map.set(item.ingredientId, cur);
+        }
+      });
+      return Array.from(map.values());
+    },
+    [],
+  );
+
+  /* ============================================================
+     烹饪任务（CookingSession）
+     ============================================================ */
+  const [currentCooking, setCurrentCooking] = useState<CookingSession | null>(null);
+  /** 同步到 ref，供 completeCooking 读取最新值，避免在 updater 内产生副作用 */
+  const currentCookingRef = useRef<CookingSession | null>(null);
+  currentCookingRef.current = currentCooking;
+
+  /** 开始烹饪：锁定本次 recipeId / 份数 / 实际消耗清单（覆盖上一次任务） */
+  const beginCooking = useCallback((recipe: Recipe, servings: number) => {
+    setCurrentCooking({
+      recipeId: recipe.id,
+      recipeName: recipe.name,
+      servings,
+      baseServings: recipe.baseServings,
+      ingredientsToConsume: buildConsumeList(recipe, servings),
+      consumed: false,
+      createdAt: Date.now(),
+    });
   }, []);
+
+  /**
+   * 完成烹饪：按当前 CookingSession 扣减库存。
+   * 双重保险防重复：consumed 标记（state）+ 仅在未 consumed 时执行；
+   * setPantry 的 updater 保持纯函数，StrictMode 重放也不会重复扣减。
+   */
+  const completeCooking = useCallback(() => {
+    const session = currentCookingRef.current;
+    if (!session || session.consumed) return;
+    setPantry((prev) => applyConsume(prev, session.ingredientsToConsume));
+    setCurrentCooking((c) => (c ? { ...c, consumed: true } : c));
+  }, [applyConsume]);
 
   const addCustomIngredient = useCallback((name: string) => {
     const trimmed = name.trim();
@@ -474,6 +532,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     setRecognition(null);
     setRecognitionStatus('idle');
     setConfirmedIngredients([]);
+    setCurrentCooking(null);
     resetGeneration();
   }, [resetGeneration]);
 
@@ -514,7 +573,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       recordToPantry,
       generateFromPantry,
       generateFromMerged,
-      consumeRecipe,
+
+      currentCooking,
+      beginCooking,
+      completeCooking,
 
       confirmedIngredients,
       generationStatus,
@@ -553,7 +615,10 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       recordToPantry,
       generateFromPantry,
       generateFromMerged,
-      consumeRecipe,
+
+      currentCooking,
+      beginCooking,
+      completeCooking,
       confirmedIngredients,
       generationStatus,
       aiRecipe,

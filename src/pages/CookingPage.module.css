@@ -222,6 +222,47 @@
   letter-spacing: 0.04em;
 }
 
+/* 完成页：本次用掉清单 */
+.consumeSummary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  max-width: 320px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--paper-raised);
+  border: 1px solid var(--paper-line);
+}
+
+.consumeTitle {
+  margin: 0;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+
+.consumeList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.consumeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+  background: var(--moss-soft);
+  color: var(--moss-deep);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 .doneActions {
   display: flex;
   flex-direction: column;

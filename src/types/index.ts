@@ -75,14 +75,64 @@ export interface RecipeStep {
   cookBrief?: string;
 }
 
+/** 菜谱中的一道食材（结构化用量） */
+export interface RecipeIngredient {
+  /** 关联食材 id（与「我的厨房」库存一致关联，不依赖名称） */
+  ingredientId: string;
+  name: string;
+  /** 基础份数（baseServings）下的用量，数值可缩放 */
+  baseAmount: number;
+  /** 用量单位：个 / 颗 / 根 / 把 / 片 / 瓣 / ml / L / g / kg 等 */
+  unit: string;
+  /**
+   * 定性用量备注，如「适量」「少许」。
+   * 仅在 scalable=false 时作为展示文案，不参与份数缩放。
+   */
+  note?: string;
+  /**
+   * 是否参与份数缩放：
+   *  true  = 按比例的精确数值，随 servings 实时计算；
+   *  false = 定性描述（如「适量」），始终保持 note 原样、不缩放。
+   */
+  scalable: boolean;
+}
+
+/** 一道菜完成烹饪后，针对某食材计划消耗的量（已按 servings 缩放） */
+export interface ConsumeItem {
+  ingredientId: string;
+  name: string;
+  /** 本次实际消耗量（底层保留可计算数值，不做展示取整） */
+  amount: number;
+  unit: string;
+}
+
+/** 一次烹饪任务：开始烹饪时锁定 recipeId / 份数 / 实际消耗清单 */
+export interface CookingSession {
+  recipeId: string;
+  recipeName: string;
+  /** 用户当前选择的份数（锁定为本次烹饪的最终参数） */
+  servings: number;
+  /** 菜谱基础份数，用于回溯缩放比例 */
+  baseServings: number;
+  /** 已按 servings 缩放、待扣减的食材清单 */
+  ingredientsToConsume: ConsumeItem[];
+  /** 是否已对库存执行过扣减（防止同一任务重复扣减） */
+  consumed: boolean;
+  createdAt: number;
+}
+
 /** 菜谱 */
 export interface Recipe {
   id: string;
   name: string;
   subtitle: string;
-  ingredientIds: string[];
+  /** 结构化食材（含基础用量与单位），替代原 ingredientIds */
+  ingredients: RecipeIngredient[];
   timeMin: number;
   difficulty: '简单' | '适中' | '有点挑战';
+  /** AI 最初生成菜谱时的标准份数（换算基准，不可随意改动） */
+  baseServings: number;
+  /** 用户当前实际选择的份数（可由用户在详情页调整） */
   servings: number;
   tags: string[];
   /** 自然笔记式导语 */
@@ -92,6 +142,10 @@ export interface Recipe {
   /** 灵活替换：可以把某样食材换成另一样（Demo 用） */
   substitutes?: Array<{ from: string; to: string; note?: string }>;
 }
+
+/** 取菜谱用到的食材 id 集合（兼容旧用法） */
+export const recipeIngredientIds = (recipe: Recipe): string[] =>
+  recipe.ingredients.map((item) => item.ingredientId);
 
 /** 调料 / 调味品 */
 export interface Seasoning {

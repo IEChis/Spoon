@@ -17,7 +17,7 @@ interface RecipeArtProps {
  * 没有真实资产的食材回退到 SVG 线稿，整体仍保持同一视觉语言。
  */
 export function RecipeArt({ recipe, className, max = 4 }: RecipeArtProps) {
-  const ids = (recipe.ingredientIds ?? []).slice(0, max);
+  const ids = recipe.ingredients.slice(0, max).map((i) => i.ingredientId);
 
   return (
     <div className={[styles.recipeArt, className].filter(Boolean).join(' ')}>

@@ -30,7 +30,9 @@ export default function RecipesPage() {
       const matchKeyword =
         kw === '' ||
         recipe.name.toLowerCase().includes(kw) ||
-        recipe.ingredientIds.some((id) => id.includes(kw)) ||
+        recipe.ingredients.some(
+          (i) => i.name.toLowerCase().includes(kw) || i.ingredientId.includes(kw),
+        ) ||
         recipe.tags.some((tag) => tag.toLowerCase().includes(kw));
 
       const matchFilter =

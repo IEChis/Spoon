@@ -23,7 +23,6 @@ export default function RecipeGeneratingPage() {
     generationStatus,
     aiRecipe,
     generationError,
-    photoSeeds,
     regenerate,
     resetFlow,
   } = useAppStore();
@@ -86,7 +85,7 @@ export default function RecipeGeneratingPage() {
   if (generationStatus === 'empty') {
     return (
         <AppShell
-          header={<ScreenHeader title="菜谱" back onBack={() => navigate(photoSeeds.length > 0 ? '/recognition' : '/')} />}
+          header={<ScreenHeader title="菜谱" back onBack={() => { if (window.history.length > 1) navigate(-1); else navigate('/'); }} />}
           className="fade-up"
         >
           <div className={styles.resultWrap}>
@@ -105,7 +104,7 @@ export default function RecipeGeneratingPage() {
   if (generationStatus === 'error') {
     return (
         <AppShell
-          header={<ScreenHeader title="菜谱" back onBack={() => navigate(photoSeeds.length > 0 ? '/recognition' : '/')} />}
+          header={<ScreenHeader title="菜谱" back onBack={() => { if (window.history.length > 1) navigate(-1); else navigate('/'); }} />}
           className="fade-up"
         >
           <div className={styles.resultWrap}>
@@ -129,7 +128,7 @@ export default function RecipeGeneratingPage() {
         <ScreenHeader
           title="正在为你生成菜谱"
           back
-          onBack={() => navigate(photoSeeds.length > 0 ? '/recognition' : '/')}
+          onBack={() => { if (window.history.length > 1) navigate(-1); else navigate('/'); }}
         />
       }
       showTabBar={false}

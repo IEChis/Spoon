@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { TouchEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '@/components/Icon';
 import { getRecipe } from '@/mock/recipes';
+import { formatAmount } from '@/utils/servings';
 import { useAppStore } from '@/store/AppStore';
 import type { Recipe } from '@/types';
 import styles from './CookingPage.module.css';
@@ -18,15 +19,27 @@ import styles from './CookingPage.module.css';
 export default function CookingPage() {
   const { recipeId } = useParams<{ recipeId?: string }>();
   const navigate = useNavigate();
-  const { aiRecipe, consumeRecipe } = useAppStore();
+  const { aiRecipe, currentCooking, beginCooking, completeCooking } = useAppStore();
 
-  const isAiFlow = !recipeId;
   const recipe: Recipe | undefined = recipeId ? getRecipe(recipeId) : aiRecipe ?? undefined;
 
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
-  /** 保证一道菜只消耗一次库存 */
-  const consumedRef = useRef(false);
+  /** 保证一次烹饪任务的库存只消耗一次 */
+  const finishedRef = useRef(false);
+
+  /**
+   * 挂载时确保存在与当前菜谱匹配的烹饪任务：
+   *  - 若详情页「开始烹饪」已锁定（含用户所选份数），直接沿用；
+   *  - 否则（如直接进入 / 刷新）按菜谱默认份数建立，避免无会话可扣。
+   */
+  useEffect(() => {
+    if (recipe && (!currentCooking || currentCooking.recipeId !== recipe.id)) {
+      beginCooking(recipe, recipe.servings);
+    }
+    // 仅挂载时执行一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const touchX = useRef<number | null>(null);
   const onTouchStart = (e: TouchEvent) => {
@@ -60,15 +73,18 @@ export default function CookingPage() {
   const next = () => {
     if (done) return;
     if (isLast) {
-      if (!consumedRef.current && recipe) {
-        consumeRecipe(recipe);
-        consumedRef.current = true;
+      if (!finishedRef.current) {
+        finishedRef.current = true;
+        completeCooking();
       }
       setDone(true);
     } else setStep((s) => Math.min(s + 1, total - 1));
   };
   const prev = () => setStep((s) => Math.max(s - 1, 0));
-  const exit = () => navigate(isAiFlow ? '/recipe' : `/recipe/${recipe.id}`);
+  const exit = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
 
   /* ---------------- 完成页 ---------------- */
   if (done) {
@@ -80,6 +96,20 @@ export default function CookingPage() {
           </div>
           <h2 className={styles.doneTitle}>完成啦。</h2>
           <p className={styles.doneSub}>今天也好好吃饭了。</p>
+          {currentCooking && currentCooking.ingredientsToConsume.length > 0 && (
+            <div className={styles.consumeSummary}>
+              <p className={styles.consumeTitle}>
+                本次 {currentCooking.servings} 人份 · 已用掉
+              </p>
+              <div className={styles.consumeList}>
+                {currentCooking.ingredientsToConsume.map((c) => (
+                  <span key={c.ingredientId} className={styles.consumeChip}>
+                    {c.name} {formatAmount(c.amount, c.unit)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           <div className={styles.doneActions}>
             <button className={styles.donePrimary} onClick={() => navigate('/camera')}>
               <Icon name="camera" size={18} />
@@ -107,7 +137,9 @@ export default function CookingPage() {
 
       {/* 进度 */}
       <div className={styles.progress}>
-        <span className={styles.recipeName}>{recipe.name}</span>
+        <span className={styles.recipeName}>
+          {recipe.name} · {currentCooking?.servings ?? recipe.servings} 人份
+        </span>
         <span className={styles.count}>
           步骤 {Math.min(step + 1, total)} / {total}
         </span>

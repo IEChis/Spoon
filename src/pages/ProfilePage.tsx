@@ -359,7 +359,7 @@ export default function ProfilePage() {
                   >
                     <span className={styles.itemIcon}>
                       <IngredientToken
-                        id={recipe?.ingredientIds[0] ?? ''}
+                        id={recipe?.ingredients[0]?.ingredientId ?? ''}
                         size={26}
                         className={styles.itemIllu}
                       />

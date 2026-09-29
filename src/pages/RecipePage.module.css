@@ -137,6 +137,145 @@
   letter-spacing: 0.04em;
 }
 
+/* ---------- 第四层：份数选择 ---------- */
+.servingsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+}
+
+.servingsLabel {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.stepBtn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+  font-family: var(--font-serif);
+  transition: transform 0.14s ease, background-color 0.16s ease, opacity 0.16s ease;
+}
+
+.stepBtn:active:not(:disabled) {
+  transform: scale(0.93);
+  background: var(--paper-sunken);
+}
+
+.stepBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.servingsVal {
+  min-width: 64px;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 食材清单（本次需要 + 库存对比） ---------- */
+.sectionSub {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+}
+
+.ingList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ingRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'name amount'
+    'stock status';
+  align-items: center;
+  gap: 2px 8px;
+  padding: 10px 14px;
+  border-radius: var(--r-lg);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+}
+
+.ingRowWarn {
+  border-color: rgba(200, 120, 70, 0.4);
+}
+
+.ingName {
+  grid-area: name;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-base);
+  color: var(--ink);
+}
+
+.ingAmount {
+  grid-area: amount;
+  justify-self: end;
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ingStock {
+  grid-area: stock;
+  font-size: var(--fs-sm);
+  color: var(--ink-mute);
+}
+
+.ingStatus {
+  grid-area: status;
+  justify-self: end;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.statusOk {
+  color: var(--moss-deep);
+}
+
+.statusShort {
+  color: var(--clay);
+}
+
+.statusMiss {
+  color: var(--ink-mute);
+}
+
 /* ---------- 第五层：烹饪步骤 ---------- */
 .steps {
   list-style: none;
