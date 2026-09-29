@@ -4,7 +4,7 @@ import { INGREDIENTS, getIngredient } from '@/mock/ingredients';
 import { getCookware, getSeasoning } from '@/mock/kitchen';
 import { generateRecipe } from '@/services/recipe';
 import { recognizeIngredients, mergeRecognitions } from '@/services/recognition';
-import { buildConsumeList } from '@/utils/servings';
+import { buildConsumeList, COUNT_UNITS } from '@/utils/servings';
 import type {
   ConsumeItem,
   Cookware,
@@ -416,12 +416,17 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         const cur = map.get(item.ingredientId);
         if (!cur) return; // 不在厨房库存中，跳过
         if (cur.stockUnit && item.unit && cur.stockUnit !== item.unit) return; // 单位不一致，不误扣
-        const deduct = Math.min(cur.stock ?? 0, item.amount);
+        // 计数类食材按整数扣（向上取整兜底），避免库存出现 0.5 个鸡蛋
+        const rawAmount = COUNT_UNITS.has(item.unit) ? Math.ceil(item.amount) : item.amount;
+        const deduct = Math.min(cur.stock ?? 0, rawAmount);
         const newStock = (cur.stock ?? 0) - deduct;
         if (newStock <= 0.0001) {
           map.delete(item.ingredientId); // 归零移除
         } else {
-          cur.stock = Math.round(newStock * 100) / 100; // 消除浮点尾差
+          // 计数类食材库存也保持整数；重量/体积保留 2 位小数消除浮点尾差
+          cur.stock = COUNT_UNITS.has(item.unit)
+            ? Math.round(newStock)
+            : Math.round(newStock * 100) / 100;
           map.set(item.ingredientId, cur);
         }
       });

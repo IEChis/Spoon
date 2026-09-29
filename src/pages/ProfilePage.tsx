@@ -7,6 +7,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { RECIPES } from '@/mock/recipes';
 import { COOKWARE, SEASONINGS } from '@/mock/kitchen';
 import { ALL_INGREDIENT_OPTIONS, useAppStore } from '@/store/AppStore';
+import { COUNT_UNITS } from '@/utils/servings';
 import styles from './ProfilePage.module.css';
 
 /* 我的厨房：可增删 / 自定义的管理控件（菜篮子、调料台、厨具通用）
@@ -248,7 +249,9 @@ export default function ProfilePage() {
                   meta={(item) =>
                     item.stock !== undefined ? (
                       <span className={styles.kmStock}>
-                        {item.stock}
+                        {item.stockUnit && COUNT_UNITS.has(item.stockUnit)
+                          ? Math.round(item.stock)
+                          : item.stock}
                         {item.stockUnit ?? '份'}
                       </span>
                     ) : null

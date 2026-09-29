@@ -62,17 +62,21 @@ export function formatAmount(amount: number, unit: string): string {
 
 /**
  * 由菜谱与选定份数，生成本次烹饪计划消耗量：
- *  - 仅包含可缩放（scalable=true）的食材，按其精确缩放值；
+ *  - 仅包含可缩放（scalable=true）的食材；
+ *  - 计数类食材（个/根/把…）向上取整，避免库存出现「0.5 个鸡蛋」；
+ *  - 重量/体积（g/ml…）保留精确值；
  *  - 定性食材（如「适量」）不参与精确扣减，不进入清单。
- * 底层保留精确数值，不做展示取整。
  */
 export function buildConsumeList(recipe: Recipe, servings: number): ConsumeItem[] {
   return recipe.ingredients
     .filter((item) => item.scalable)
-    .map((item) => ({
-      ingredientId: item.ingredientId,
-      name: item.name,
-      amount: scaleAmount(item.baseAmount, recipe.baseServings, servings),
-      unit: item.unit,
-    }));
+    .map((item) => {
+      const scaled = scaleAmount(item.baseAmount, recipe.baseServings, servings);
+      return {
+        ingredientId: item.ingredientId,
+        name: item.name,
+        amount: COUNT_UNITS.has(item.unit) ? Math.ceil(scaled) : scaled,
+        unit: item.unit,
+      };
+    });
 }
